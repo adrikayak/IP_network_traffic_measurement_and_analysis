@@ -1,0 +1,24 @@
+//loop over each IP and send GET request and store reply 
+
+for i in $(awk '/#/{next}{print $1}' flows60sec_2.t2); 
+do
+GET "http://api.hostip.info/get_html.php?ip=$i" >> ipcountry; 
+
+//remove the city and ip fields and leave only country field
+
+awk 'NR == 1 || NR % 3 == 1' ipcountry > iponlycountry; 31
+
+//remove 'country:' and leave only name of the country
+
+awk '{ print substr($0,9) }' iponlycountry > ipcountry_clean;
+
+//sort the countries alphabeticly 
+
+cat ipcountry_clean | sort -g > sortedcountries; 
+
+//count occurrence of each country and write this value next 
+//to each country in descending order 
+
+sort sortedcountries | uniq -c | sort -nr > countires_final ;
+
+tcptrace -l -r -n --csv  measured_data2.pcap | awk -F ', *' '/^[^#]/{print $26"\t" $27 "\t" $28 "\t" $29 "\t" $96 "\t" $97 "\t" $98 "\t" $99}'
